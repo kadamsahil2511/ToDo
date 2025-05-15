@@ -3,13 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To Do app</title>
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>To Do List</h1>
-    <input type="text" id="taskInput" placeholder="Add a new task">
-    <button id="addTaskButton" onclick="addTodo()">Add Task</button>
-    <ul id="taskList"></ul>
+    <div class="app-container">
+        <!-- Main Card View -->
+        <div class="card main-card">
+            <div class="card-header">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div id="username">Kendrick</div>
+                </div>
+                <div class="progress-info">
+                    <div id="progress-count">23 / 54</div>
+                    <div class="check-mark"><i class="fas fa-check"></i></div>
+                </div>
+            </div>
+            
+            <div class="coin-display">
+                <div class="coin-jar"></div>
+                <div class="coin-amount">
+                    <h1 id="total-coins">25,982</h1>
+                    <p class="coin-label">coins collected</p>
+                </div>
+            </div>
+            
+            <div class="card-content">
+                <h2>Today</h2>
+                
+                <div class="tab-container">
+                    <button class="tab active" data-tab="daily">Daily habits</button>
+                    <button class="tab" data-tab="goals">Goals</button>
+                </div>
+                
+                <div id="task-container">
+                    <!-- Tasks will be added here by JavaScript -->
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="circle-btn profile-btn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="notification-btn circle-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <button class="circle-btn add-btn">
+                        <i class="fas fa-shopping-bag"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add New Task Modal -->
+        <div class="modal" id="add-task-modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Add New Task</h2>
+                <div class="input-section">
+                    <input type="text" id="task-input" placeholder="Task description">
+                    <select id="task-category">
+                        <option value="daily">Daily Task</option>
+                        <option value="hygiene">Hygiene</option>
+                        <option value="physical">Physical Activity</option>
+                        <option value="room">Room Cleaning</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <div class="priority-selector">
+                        <label>Priority:</label>
+                        <select id="task-priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="coin-selector">
+                        <label>Coins:</label>
+                        <select id="coin-value">
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            <option value="75">75</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <button id="add-task-btn">Add Task</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rewards Modal -->
+        <div class="modal" id="rewards-modal">
+            <div class="modal-content rewards-content">
+                <span class="close-modal">&times;</span>
+                <h1>Rewards</h1>
+                <h2 class="rewards-username">Kendrick</h2>
+                <div class="rewards-list" id="rewards-list">
+                    <!-- Rewards will be added here dynamically -->
+                </div>
+                <div class="add-reward-section">
+                    <button id="add-reward-toggle" class="add-reward-toggle">+ Add Custom Reward</button>
+                    <div class="add-reward-form" id="add-reward-form" style="display: none;">
+                        <input type="text" id="reward-name" placeholder="Reward Name">
+                        <input type="text" id="reward-description" placeholder="Description (e.g. 2000 coins)">
+                        <input type="number" id="reward-cost" placeholder="Cost in coins">
+                        <button id="add-reward-btn" class="apply-btn">Add Reward</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>

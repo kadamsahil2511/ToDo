@@ -1,0 +1,642 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f0f2f5;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    background-image: url('https://images.unsplash.com/photo-1557682250-36e2d0d8cd8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: -1;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.card {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.main-card {
+    background: linear-gradient(180deg, #b4d4e7 0%, #ffffff 100%);
+    height: 85vh;
+    max-height: 750px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6bab7e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    margin-right: 10px;
+}
+
+#username {
+    font-weight: 600;
+    color: #333;
+    font-size: 18px;
+}
+
+.progress-info {
+    display: flex;
+    align-items: center;
+}
+
+#progress-count {
+    margin-right: 10px;
+    color: #333;
+    font-weight: 500;
+}
+
+.check-mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #6bab7e;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.coin-display {
+    position: relative;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    background-image: url('https://images.unsplash.com/photo-1595937892768-719a25649c60?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+    background-size: cover;
+    background-position: center bottom;
+    overflow: hidden;
+}
+
+.coin-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(180, 212, 231, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+}
+
+.coin-jar {
+    width: 100px;
+    height: 100px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/6236/6236526.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 2;
+}
+
+.coin-amount {
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 2;
+}
+
+#total-coins {
+    font-size: 46px;
+    font-weight: 700;
+    margin: 5px 0 0;
+}
+
+.coin-label {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.card-content {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+    background-color: white;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    margin-top: -20px;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-content h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 700;
+}
+
+.tab-container {
+    display: flex;
+    margin-bottom: 20px;
+    background: #f0f2f5;
+    border-radius: 50px;
+    padding: 3px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px 0;
+    text-align: center;
+    border: none;
+    background: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab.active {
+    background: #6bab7e;
+    color: white;
+}
+
+#task-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Task styling */
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    background-color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.task-bathroom {
+    background-color: #f7a072;
+}
+
+.task-physical {
+    background-color: #e8c95e;
+}
+
+.task-hygiene {
+    background-color: #c8ba9d;
+}
+
+.task-item.completed {
+    opacity: 0.7;
+}
+
+.task-checkbox {
+    margin-right: 15px;
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.task-item.completed .task-checkbox {
+    background-color: #6bab7e;
+    border-color: #6bab7e;
+}
+
+.task-item.completed .task-checkbox::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-text {
+    color: white;
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 0;
+    word-break: break-word;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.priority-badge.low {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.priority-badge.medium {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #333;
+}
+
+.priority-badge.high {
+    background-color: rgba(255, 0, 0, 0.3);
+    color: white;
+}
+
+.task-item.priority-high {
+    border-left: 4px solid rgba(255, 0, 0, 0.7);
+}
+
+.task-item.priority-low {
+    border-left: 4px solid rgba(0, 255, 0, 0.3);
+}
+
+.task-coins {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.task-coins::before {
+    content: '\f3a5';
+    font-family: 'Font Awesome 5 Free';
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px 20px;
+    color: #999;
+    font-style: italic;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 15px;
+    gap: 15px;
+}
+
+.circle-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: #f0f2f5;
+    color: #666;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+}
+
+.circle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-btn {
+    background-color: #6bab7e;
+    color: white;
+}
+
+.add-btn {
+    background-color: white;
+    color: #333;
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+}
+
+.notification-btn {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #ff5252;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#task-input,
+#task-category,
+#coin-value {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.coin-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#add-task-btn {
+    background-color: #6bab7e;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#add-task-btn:hover {
+    background-color: #5c9b6e;
+}
+
+/* Rewards styling */
+.rewards-content {
+    padding-top: 20px;
+}
+
+.rewards-username {
+    font-size: 36px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.rewards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.reward-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f2f5;
+    padding: 15px;
+    border-radius: 15px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.reward-info h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+}
+
+.reward-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #777;
+}
+
+.reward-count {
+    font-size: 14px;
+    color: #666;
+}
+
+.apply-btn {
+    background-color: #6bab7e;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.apply-btn:hover {
+    background-color: #5c9b6e;
+}
+
+.reward-item.purchased {
+    background-color: #e8f5e9;
+    border: 1px solid #6bab7e;
+}
+
+.add-reward-section {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.add-reward-toggle {
+    background: none;
+    border: none;
+    color: #6bab7e;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.add-reward-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-reward-form input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateX(50px);
+    animation: showToast 0.3s forwards, hideToast 0.3s 2.7s forwards;
+}
+
+@keyframes showToast {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hideToast {
+    to { opacity: 0; transform: translateX(50px); }
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .app-container {
+        max-width: 100%;
+    }
+    
+    .main-card {
+        height: 100vh;
+        border-radius: 0;
+    }
+}
