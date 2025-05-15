@@ -556,25 +556,141 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add notification click handler
-    document.querySelector('.notification-btn').addEventListener('click', function() {
-        // Mark all notifications as read
+
+    const notificationsModal = document.getElementById('notifications-modal');
+    
+    function renderNotifications() {
+        const notificationsList = document.getElementById('notifications-list');
+        notificationsList.innerHTML = '';
+        
+        if (notifications.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = '<p>No notifications yet</p><i class="fas fa-bell-slash" style="font-size: 32px; margin-top: 15px; opacity: 0.3;"></i>';
+            notificationsList.appendChild(emptyState);
+            return;
+        }
+        
+        // Sort notifications by timestamp (newest first)
+        const sortedNotifications = [...notifications].sort((a, b) => 
+            new Date(b.timestamp) - new Date(a.timestamp));
+        
+        sortedNotifications.forEach((notification, index) => {
+            const notificationElement = createNotificationElement(notification);
+            // Add staggered animation delay based on index
+            notificationElement.style.animationDelay = `${index * 0.05}s`;
+            notificationsList.appendChild(notificationElement);
+        });
+        
+        // Mark all as read
         notifications.forEach(notification => {
             notification.read = true;
         });
         localStorage.setItem('notifications', JSON.stringify(notifications));
         updateNotificationCount();
+    }
+    
+    function createNotificationElement(notification) {
+        const notificationItem = document.createElement('div');
+        notificationItem.className = 'notification-item';
+        if (!notification.read) {
+            notificationItem.classList.add('unread');
+        }
+        notificationItem.setAttribute('data-id', notification.id);
         
-        // Show a toast with the latest notification
-        if (notifications.length > 0) {
-            const latestNotifications = notifications.slice(-3);
-            latestNotifications.forEach((notification, index) => {
-                setTimeout(() => {
-                    showToast(notification.message);
-                }, index * 1500);
-            });
+        // Get relative time (e.g. "5 minutes ago", "2 hours ago")
+        const relativeTime = getRelativeTime(notification.timestamp);
+        
+        // Format the timestamp to a human-readable date/time
+        const timestamp = new Date(notification.timestamp);
+        const formattedDate = timestamp.toLocaleDateString();
+        const formattedTime = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        // Create appropriate icon based on the notification message
+        let icon = 'fa-bell';
+        if (notification.message.includes('coin')) {
+            icon = 'fa-coins';
+        } else if (notification.message.includes('completed')) {
+            icon = 'fa-check-circle';
+        } else if (notification.message.includes('claimed') || notification.message.includes('purchased')) {
+            icon = 'fa-gift';
+        }
+        
+        notificationItem.innerHTML = `
+            <div class="notification-icon">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div class="notification-content">
+                <p class="notification-message">${notification.message}</p>
+                <p class="notification-time" title="${formattedDate} at ${formattedTime}">${relativeTime}</p>
+            </div>
+            <button class="delete-notification" title="Delete notification"><i class="fas fa-times"></i></button>
+        `;
+        
+        // Add event listener to delete button
+        notificationItem.querySelector('.delete-notification').addEventListener('click', function(e) {
+            e.stopPropagation();
+            notificationItem.classList.add('deleting');
+            
+            // Wait for animation to complete before actually removing
+            setTimeout(() => {
+                deleteNotification(notification.id);
+            }, 300);
+        });
+        
+        return notificationItem;
+    }
+    
+    // Helper function to display relative time
+    function getRelativeTime(timestamp) {
+        const now = new Date();
+        const then = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - then) / 1000);
+        
+        if (diffInSeconds < 60) {
+            return 'Just now';
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else if (diffInSeconds < 604800) {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} day${days > 1 ? 's' : ''} ago`;
         } else {
-            showToast('No notifications');
+            const weeks = Math.floor(diffInSeconds / 604800);
+            return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+        }
+    }
+    
+    function deleteNotification(id) {
+        notifications = notifications.filter(notification => notification.id !== id);
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        renderNotifications();
+        
+        if (notifications.length === 0) {
+
+            updateNotificationCount();
+        }
+        
+        showToast('Notification deleted');
+    }
+    
+
+    document.querySelector('.notification-btn').addEventListener('click', function() {
+        renderNotifications();
+        notificationsModal.classList.add('show');
+    });
+    
+
+    document.getElementById('clear-notifications').addEventListener('click', function() {
+        if (notifications.length > 0) {
+            notifications = [];
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            renderNotifications();
+            updateNotificationCount();
+            showToast('All notifications cleared');
         }
     });
     
@@ -616,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
     }
     
-    // Add animations
+
     document.head.insertAdjacentHTML('beforeend', `
         <style>
             @keyframes shake {
@@ -666,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </style>
     `);
     
-    // Allow user to change username
+
     document.getElementById('username').addEventListener('click', function() {
         const newUsername = prompt('Enter your name:', username);
         if (newUsername && newUsername.trim() !== '') {

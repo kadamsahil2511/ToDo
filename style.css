@@ -13,7 +13,7 @@ body {
     justify-content: center;
     align-items: center;
     color: #333;
-    background-image: url('https://cdn.wallpaperhub.app/cloudcache/7/c/4/d/3/0/7c4d3040631ac5f3f3b6bdae70a7b63a7d2c9f29.jpg');
+    background-image: url('https://tjime.com/bg_web.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -54,9 +54,9 @@ body::before {
 }
 
 .main-card {
-    background: linear-gradient(180deg, #b4d4e7 0%, #ffffff 100%);
-    height: 85vh;
-    max-height: 750px;
+    background: linear-gradient(180deg, #427a66 0%, #ffffff 100%);
+    height: 100vh;
+    max-height: 800px;
     display: flex;
     flex-direction: column;
 }
@@ -87,7 +87,8 @@ body::before {
 
 #username {
     font-weight: 600;
-    color: #333;
+    /* color: #333; */
+    color: white;
     font-size: 18px;
 }
 
@@ -98,7 +99,8 @@ body::before {
 
 #progress-count {
     margin-right: 10px;
-    color: #333;
+    /* color: #333; */
+    color: wheat;
     font-weight: 500;
 }
 
@@ -115,16 +117,17 @@ body::before {
 
 .coin-display {
     position: relative;
-    height: 180px;
+    height: 230px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-    background-image: url('https://images.unsplash.com/photo-1595937892768-719a25649c60?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+    background: linear-gradient(180deg, #427a66 0%, #2c5244 100%);
     background-size: cover;
     background-position: center bottom;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .coin-display::before {
@@ -134,7 +137,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(180deg, rgba(180, 212, 231, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .coin-jar {
@@ -173,8 +176,9 @@ body::before {
     flex: 1;
     overflow-y: auto;
     background-color: white;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
+    margin-top: 10px;
+    /* border-top-left-radius: 30px;
+    border-top-right-radius: 30px; */
     margin-top: -20px;
     position: relative;
     z-index: 3;
@@ -219,38 +223,59 @@ body::before {
 #task-container {
     flex: 1;
     overflow-y: auto;
-    padding-right: 5px;
+    padding: 5px 15px;
+    margin: 0 -10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(107, 171, 126, 0.5) transparent;
+}
+
+#task-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#task-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#task-container::-webkit-scrollbar-thumb {
+    background-color: rgba(107, 171, 126, 0.5);
+    border-radius: 3px;
 }
 
 /* Task styling */
 .task-item {
     display: flex;
     align-items: center;
-    padding: 15px 20px;
+    padding: 18px 22px;
     margin-bottom: 15px;
-    border-radius: 15px;
+    border-radius: 18px;
     background-color: #fff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     position: relative;
     overflow: hidden;
     animation: slideIn 0.3s ease-out;
+    border-left: 5px solid transparent;
+    transition: all 0.3s ease;
 }
 
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .task-bathroom {
-    background-color: #f7a072;
+    background: linear-gradient(145deg, #f7a072 0%, #f4917c 100%);
+    border-left-color: #e27b5d;
 }
 
 .task-physical {
-    background-color: #e8c95e;
+    background: linear-gradient(145deg, #e8c95e 0%, #e5c14f 100%);
+    border-left-color: #d4b13a;
 }
 
 .task-hygiene {
-    background-color: #c8ba9d;
+    background: linear-gradient(145deg, #c8ba9d 0%, #bfb193 100%);
+    border-left-color: #a89b7d;
 }
 
 .task-item.completed {
@@ -533,6 +558,95 @@ body::before {
     background-color: #5c9b6e;
 }
 
+/* Add New Task Modal improvements */
+#add-task-modal .modal-content {
+    background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+    box-shadow: 0 8px 32px rgba(107, 171, 126, 0.18);
+    border-radius: 24px;
+    padding: 32px 28px 28px 28px;
+    max-width: 420px;
+    animation: fadeIn 0.4s;
+}
+#add-task-modal h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2e4d3a;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+}
+#add-task-modal .input-section {
+    gap: 18px;
+}
+#add-task-modal input[type="text"],
+#add-task-modal select {
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #dbe7dd;
+    font-size: 1rem;
+    background: #f8faf9;
+    transition: border 0.2s;
+}
+#add-task-modal input[type="text"]:focus,
+#add-task-modal select:focus {
+    border: 1.5px solid #6bab7e;
+    outline: none;
+}
+#add-task-modal label {
+    font-weight: 600;
+    color: #3a5c47;
+    margin-right: 8px;
+}
+#add-task-modal .priority-selector,
+#add-task-modal .coin-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#add-task-modal #add-task-btn {
+    background: linear-gradient(90deg, #6bab7e 60%, #427a66 100%);
+    color: #fff;
+    border: none;
+    padding: 14px 0;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(107, 171, 126, 0.10);
+    transition: background 0.2s, box-shadow 0.2s;
+    width: 100%;
+    letter-spacing: 0.5px;
+}
+#add-task-modal #add-task-btn:hover {
+    background: linear-gradient(90deg, #427a66 60%, #6bab7e 100%);
+    box-shadow: 0 4px 16px rgba(107, 171, 126, 0.18);
+}
+#add-task-modal .close-modal {
+    top: 18px;
+    right: 18px;
+    color: #bdbdbd;
+    font-size: 28px;
+    transition: color 0.2s;
+}
+#add-task-modal .close-modal:hover {
+    color: #6bab7e;
+}
+#add-task-modal select {
+    cursor: pointer;
+}
+#add-task-modal option {
+    background: #f8faf9;
+    color: #2e4d3a;
+}
+@media (max-width: 500px) {
+    #add-task-modal .modal-content {
+        padding: 18px 6vw 18px 6vw;
+        max-width: 98vw;
+    }
+    #add-task-modal h2 {
+        font-size: 1.3rem;
+    }
+}
+
 /* Rewards styling */
 .rewards-content {
     padding-top: 20px;
@@ -634,6 +748,94 @@ body::before {
     font-size: 14px;
 }
 
+/* Notifications styling */
+.notifications-content {
+    padding-top: 20px;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 350px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.notification-item {
+    position: relative;
+    background-color: #f0f2f5;
+    padding: 15px;
+    border-radius: 12px;
+    animation: fadeIn 0.3s ease-out;
+    border-left: 4px solid #6bab7e;
+    margin-bottom: 3px;
+    transform-origin: top;
+    transition: all 0.3s;
+    overflow: hidden;
+}
+
+.notification-item.deleting {
+    transform: translateX(100%);
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item .notification-message {
+    margin: 0;
+    font-size: 15px;
+    color: #333;
+    padding-right: 30px;
+    font-weight: 500;
+}
+
+.notification-item .notification-time {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: #777;
+    display: flex;
+    align-items: center;
+}
+
+.notification-item .notification-time:before {
+    content: '\f017'; /* clock icon */
+    font-family: 'Font Awesome 5 Free';
+    margin-right: 5px;
+    font-size: 10px;
+}
+
+.notification-item .delete-notification {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.5;
+    transition: all 0.2s;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-item .delete-notification:hover {
+    opacity: 1;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.notifications-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
 /* Toast notifications */
 .toast-container {
     position: fixed;
@@ -672,8 +874,9 @@ body::before {
     }
     
     .main-card {
-        height: 100vh;
         border-radius: 0;
+        height: 100vh;
+        max-height: 100vh;
     }
     body{
         padding: 0;
