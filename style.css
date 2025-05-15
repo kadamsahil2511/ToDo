@@ -13,7 +13,7 @@ body {
     justify-content: center;
     align-items: center;
     color: #333;
-    background-image: url('https://images.unsplash.com/photo-1557682250-36e2d0d8cd8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+    background-image: url('https://cdn.wallpaperhub.app/cloudcache/7/c/4/d/3/0/7c4d3040631ac5f3f3b6bdae70a7b63a7d2c9f29.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -674,5 +674,8 @@ body::before {
     .main-card {
         height: 100vh;
         border-radius: 0;
+    }
+    body{
+        padding: 0;
     }
 }

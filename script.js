@@ -593,38 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function getDefaultTasks() {
-        return [
-            {
-                id: 1,
-                text: 'Tidy up bathroom and bedroom',
-                category: 'bathroom',
-                coins: 30,
-                completed: false,
-                priority: 'medium',
-                type: 'daily',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: 2,
-                text: 'Physical activity (sports, workout, etc.)',
-                category: 'physical',
-                coins: 40,
-                completed: false,
-                priority: 'medium',
-                type: 'daily',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: 3,
-                text: 'Proactively maintain hygiene and groom',
-                category: 'hygiene',
-                coins: 50,
-                completed: false,
-                priority: 'medium',
-                type: 'daily',
-                createdAt: new Date().toISOString()
-            }
-        ];
+        return [];
     }
     
     function getDefaultRewards() {
