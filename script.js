@@ -17,22 +17,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressCountElement = document.getElementById('progress-count');
     const usernameElements = document.querySelectorAll('#username, .rewards-username');
     const notificationBadge = document.querySelector('.notification-badge');
-    
+    const audio = new Audio('audio.mp3'); 
     // App state
     let tasks = JSON.parse(localStorage.getItem('tasks')) || getDefaultTasks();
     let rewards = JSON.parse(localStorage.getItem('rewards')) || getDefaultRewards();
-    let currentTab = 'daily';
+    let currentTab = localStorage.getItem('currentTab') || 'daily';
     let totalCoins = parseInt(localStorage.getItem('totalCoins')) || 0;
     let username = localStorage.getItem('username') || 'User';
     let completedCount = 0;
     let totalCount = 0;
-    let notifications = [];
+    let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
     let deletionTimers = {}; // Track deletion timers for completed tasks
     
     // Initialize app
     initApp();
     
     function initApp() {
+        // Set up deletion timers for completed tasks that have not been deleted yet
+        tasks.forEach(task => {
+            if (task.completed && task.deleteAt) {
+                const deleteTime = new Date(task.deleteAt).getTime();
+                const now = Date.now();
+                const timeRemaining = deleteTime - now;
+                
+                if (timeRemaining > 0) {
+                    deletionTimers[task.id] = setTimeout(() => {
+                        deleteCompletedTask(task.id);
+                    }, timeRemaining);
+                } else {
+                    // If the delete time has passed, remove the task immediately
+                    deleteCompletedTask(task.id);
+                }
+            }
+        });
+        
+        setActiveTab(currentTab); // Initialize the active tab
         renderTasks();
         updateCoinDisplay();
         updateProgress();
@@ -46,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const tabName = this.getAttribute('data-tab');
             setActiveTab(tabName);
             currentTab = tabName;
+            localStorage.setItem('currentTab', currentTab);
             renderTasks();
         });
     });
@@ -191,6 +211,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function renderTasks() {
+        // Clear any existing intervals before removing task elements
+        const existingTasks = document.querySelectorAll('.task-item');
+        existingTasks.forEach(taskElement => {
+            const timerId = taskElement.dataset.timerId;
+            if (timerId) {
+                clearInterval(parseInt(timerId));
+            }
+        });
+        
         taskContainer.innerHTML = '';
         
         const filteredTasks = tasks.filter(task => task.type === currentTab);
@@ -224,7 +253,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create checkbox
         const checkbox = document.createElement('div');
         checkbox.className = 'task-checkbox';
-        checkbox.addEventListener('click', () => toggleTask(task.id));
+        // Only allow checking uncompleted tasks
+        if (!task.completed) {
+            checkbox.addEventListener('click', () => toggleTask(task.id));
+        }
         
         // Create task content
         const taskContent = document.createElement('div');
@@ -235,10 +267,38 @@ document.addEventListener('DOMContentLoaded', function() {
         taskText.textContent = task.text;
         
         // Add timer indicator for completed tasks
-        if (task.completed) {
+        if (task.completed && task.deleteAt) {
             const timerIndicator = document.createElement('div');
             timerIndicator.className = 'timer-indicator';
-            timerIndicator.innerHTML = '<i class="fas fa-clock"></i> Auto-deleting in 5m';
+            
+            // Calculate remaining time
+            const deleteTime = new Date(task.deleteAt).getTime();
+            const now = Date.now();
+            const timeRemaining = Math.max(0, Math.floor((deleteTime - now) / 1000));
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            
+            timerIndicator.innerHTML = `<i class="fas fa-clock"></i> Auto-deleting in ${minutes}m ${seconds}s`;
+            
+            // Update the timer every second
+            if (timeRemaining > 0) {
+                const timerId = setInterval(() => {
+                    const newNow = Date.now();
+                    const newTimeRemaining = Math.max(0, Math.floor((deleteTime - newNow) / 1000));
+                    const newMinutes = Math.floor(newTimeRemaining / 60);
+                    const newSeconds = newTimeRemaining % 60;
+                    
+                    if (newTimeRemaining <= 0) {
+                        clearInterval(timerId);
+                    } else {
+                        timerIndicator.innerHTML = `<i class="fas fa-clock"></i> Auto-deleting in ${newMinutes}m ${newSeconds}s`;
+                    }
+                }, 1000);
+                
+                // Store the interval ID so it can be cleared when the component is removed
+                taskItem.dataset.timerId = timerId;
+            }
+            
             taskContent.appendChild(timerIndicator);
         }
         
@@ -261,6 +321,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        
+        // Make delete button always visible for completed tasks
+        if (task.completed) {
+            deleteBtn.style.opacity = '1';
+        }
+        
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             deleteCompletedTask(task.id);
@@ -292,6 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function addCoins(amount) {
+        audio.play();
         totalCoins += amount;
         localStorage.setItem('totalCoins', totalCoins);
         updateCoinDisplay();
@@ -488,6 +555,28 @@ document.addEventListener('DOMContentLoaded', function() {
             notificationBadge.style.display = 'none';
         }
     }
+    
+    // Add notification click handler
+    document.querySelector('.notification-btn').addEventListener('click', function() {
+        // Mark all notifications as read
+        notifications.forEach(notification => {
+            notification.read = true;
+        });
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        updateNotificationCount();
+        
+        // Show a toast with the latest notification
+        if (notifications.length > 0) {
+            const latestNotifications = notifications.slice(-3);
+            latestNotifications.forEach((notification, index) => {
+                setTimeout(() => {
+                    showToast(notification.message);
+                }, index * 1500);
+            });
+        } else {
+            showToast('No notifications');
+        }
+    });
     
     // Toast notification
     function showToast(message) {
