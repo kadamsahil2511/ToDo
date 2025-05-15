@@ -15,18 +15,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const rewardsModal = document.getElementById('rewards-modal');
     const totalCoinsElement = document.getElementById('total-coins');
     const progressCountElement = document.getElementById('progress-count');
+    const usernameElements = document.querySelectorAll('#username, .rewards-username');
+    const notificationBadge = document.querySelector('.notification-badge');
     
     // App state
     let tasks = JSON.parse(localStorage.getItem('tasks')) || getDefaultTasks();
     let rewards = JSON.parse(localStorage.getItem('rewards')) || getDefaultRewards();
     let currentTab = 'daily';
     let totalCoins = parseInt(localStorage.getItem('totalCoins')) || 0;
+    let username = localStorage.getItem('username') || 'User';
     let completedCount = 0;
     let totalCount = 0;
+    let notifications = [];
+    let deletionTimers = {}; // Track deletion timers for completed tasks
     
     // Initialize app
-    renderTasks();
-    updateCoinDisplay();
+    initApp();
+    
+    function initApp() {
+        renderTasks();
+        updateCoinDisplay();
+        updateProgress();
+        updateUsername();
+        updateNotificationCount();
+    }
     
     // Event listeners
     tabs.forEach(tab => {
@@ -129,26 +141,53 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function toggleTask(id) {
         let earnedCoins = 0;
+        const task = tasks.find(t => t.id === id);
         
-        tasks = tasks.map(task => {
-            if (task.id === id) {
-                // If task is being marked as completed, add coins
-                if (!task.completed) {
-                    earnedCoins = task.coins;
-                }
-                return { ...task, completed: !task.completed };
-            }
-            return task;
-        });
-        
-        if (earnedCoins > 0) {
+        // Only allow checking uncompleted tasks, not unchecking completed tasks
+        if (task && !task.completed) {
+            // Update the task to completed
+            task.completed = true;
+            task.completedAt = new Date().toISOString();
+            earnedCoins = task.coins;
+            
+            // Store completion time for countdown display
+            task.deleteAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes from now
+            
+            // Add notification
+            addNotification(`Earned ${earnedCoins} coins for completing "${task.text}"`);
+            
+            // Add coins and show animation
             addCoins(earnedCoins);
             showCoinAnimation(earnedCoins);
+            
+            // Set a timer to delete the task after 5 minutes
+            if (deletionTimers[task.id]) {
+                clearTimeout(deletionTimers[task.id]);
+            }
+            deletionTimers[task.id] = setTimeout(() => {
+                deleteCompletedTask(task.id);
+            }, 5 * 60 * 1000); // 5 minutes
+            
+            saveTasks();
+            renderTasks();
+            updateProgress();
+            
+            showToast(`Task completed! Will be deleted in 5 minutes`);
+        }
+    }
+    
+    function deleteCompletedTask(id) {
+        tasks = tasks.filter(task => task.id !== id);
+        
+        if (deletionTimers[id]) {
+            delete deletionTimers[id];
         }
         
         saveTasks();
         renderTasks();
         updateProgress();
+        
+        showToast("Completed task was automatically removed");
     }
     
     function renderTasks() {
@@ -164,6 +203,12 @@ document.addEventListener('DOMContentLoaded', function() {
             taskContainer.appendChild(emptyState);
             return;
         }
+        
+        // Sort tasks: incomplete tasks first, then completed tasks
+        filteredTasks.sort((a, b) => {
+            if (a.completed === b.completed) return 0;
+            return a.completed ? 1 : -1;
+        });
         
         filteredTasks.forEach(task => {
             const taskElement = createTaskElement(task);
@@ -189,6 +234,14 @@ document.addEventListener('DOMContentLoaded', function() {
         taskText.className = 'task-text';
         taskText.textContent = task.text;
         
+        // Add timer indicator for completed tasks
+        if (task.completed) {
+            const timerIndicator = document.createElement('div');
+            timerIndicator.className = 'timer-indicator';
+            timerIndicator.innerHTML = '<i class="fas fa-clock"></i> Auto-deleting in 5m';
+            taskContent.appendChild(timerIndicator);
+        }
+        
         // Add priority badge if available
         if (task.priority) {
             const priorityBadge = document.createElement('span');
@@ -204,10 +257,20 @@ document.addEventListener('DOMContentLoaded', function() {
         coinsDisplay.className = 'task-coins';
         coinsDisplay.textContent = task.coins;
         
+        // Create delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteCompletedTask(task.id);
+        });
+        
         // Append elements to taskItem
         taskItem.appendChild(checkbox);
         taskItem.appendChild(taskContent);
         taskItem.appendChild(coinsDisplay);
+        taskItem.appendChild(deleteBtn);
         
         return taskItem;
     }
@@ -238,6 +301,12 @@ document.addEventListener('DOMContentLoaded', function() {
         totalCoinsElement.textContent = totalCoins.toLocaleString();
     }
     
+    function updateUsername() {
+        usernameElements.forEach(element => {
+            element.textContent = username;
+        });
+    }
+    
     function showCoinAnimation(amount) {
         // Create floating coin animation
         const coinAnimation = document.createElement('div');
@@ -256,11 +325,182 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProgress();
     }
     
+    function saveRewards() {
+        localStorage.setItem('rewards', JSON.stringify(rewards));
+    }
+    
     function shakeElement(element) {
         element.classList.add('shake');
         setTimeout(() => {
             element.classList.remove('shake');
         }, 500);
+    }
+    
+    // Reward functions
+    function renderRewards() {
+        const rewardsList = document.getElementById('rewards-list');
+        rewardsList.innerHTML = '';
+        
+        rewards.forEach(reward => {
+            const rewardElement = createRewardElement(reward);
+            rewardsList.appendChild(rewardElement);
+        });
+    }
+    
+    function createRewardElement(reward) {
+        const rewardItem = document.createElement('div');
+        rewardItem.className = `reward-item ${reward.purchased ? 'purchased' : ''}`;
+        rewardItem.setAttribute('data-id', reward.id);
+        
+        const rewardInfo = document.createElement('div');
+        rewardInfo.className = 'reward-info';
+        
+        const rewardTitle = document.createElement('h3');
+        rewardTitle.textContent = reward.name;
+        
+        const rewardDesc = document.createElement('p');
+        rewardDesc.textContent = reward.description;
+        
+        rewardInfo.appendChild(rewardTitle);
+        rewardInfo.appendChild(rewardDesc);
+        
+        rewardItem.appendChild(rewardInfo);
+        
+        // If reward has a usage limit
+        if (reward.limit) {
+            const rewardCount = document.createElement('div');
+            rewardCount.className = 'reward-count';
+            rewardCount.textContent = `${reward.used} of ${reward.limit} used`;
+            rewardItem.appendChild(rewardCount);
+        }
+        
+        // If reward is not purchased yet and has a cost
+        if (!reward.purchased && reward.cost) {
+            const applyBtn = document.createElement('button');
+            applyBtn.className = 'apply-btn';
+            applyBtn.textContent = reward.cost > 0 ? `Buy: ${reward.cost}` : 'Claim';
+            applyBtn.disabled = reward.cost > totalCoins;
+            
+            if (reward.cost > totalCoins) {
+                applyBtn.classList.add('disabled');
+                applyBtn.title = `Need ${reward.cost - totalCoins} more coins`;
+            }
+            
+            applyBtn.addEventListener('click', () => purchaseReward(reward.id));
+            rewardItem.appendChild(applyBtn);
+        } else if (reward.purchased) {
+            const purchasedBadge = document.createElement('div');
+            purchasedBadge.className = 'purchased-badge';
+            purchasedBadge.textContent = 'Purchased';
+            rewardItem.appendChild(purchasedBadge);
+        }
+        
+        return rewardItem;
+    }
+    
+    function purchaseReward(id) {
+        const reward = rewards.find(r => r.id === id);
+        
+        if (!reward || (reward.cost > totalCoins)) {
+            showToast('Not enough coins!');
+            return;
+        }
+        
+        // Deduct coins
+        if (reward.cost > 0) {
+            addCoins(-reward.cost);
+        }
+        
+        // Update reward
+        if (reward.limit) {
+            reward.used = (reward.used || 0) + 1;
+            if (reward.used >= reward.limit) {
+                reward.purchased = true;
+            }
+        } else {
+            reward.purchased = true;
+        }
+        
+        saveRewards();
+        renderRewards();
+        
+        addNotification(`${username} has claimed "${reward.name}"`);
+        showToast(`Reward "${reward.name}" claimed!`);
+    }
+    
+    function addCustomReward() {
+        const nameInput = document.getElementById('reward-name');
+        const descInput = document.getElementById('reward-description');
+        const costInput = document.getElementById('reward-cost');
+        
+        const name = nameInput.value.trim();
+        const description = descInput.value.trim();
+        const cost = parseInt(costInput.value) || 0;
+        
+        if (name === '') {
+            shakeElement(nameInput);
+            return;
+        }
+        
+        const newReward = {
+            id: Date.now(),
+            name: name,
+            description: description,
+            cost: cost,
+            purchased: false,
+        };
+        
+        rewards.push(newReward);
+        saveRewards();
+        renderRewards();
+        
+        // Clear inputs
+        nameInput.value = '';
+        descInput.value = '';
+        costInput.value = '';
+        
+        // Hide form
+        document.getElementById('add-reward-form').style.display = 'none';
+        
+        showToast('Custom reward added!');
+    }
+    
+    // Notification functions
+    function addNotification(message) {
+        const notification = {
+            id: Date.now(),
+            message: message,
+            read: false,
+            timestamp: new Date().toISOString()
+        };
+        
+        notifications.push(notification);
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        updateNotificationCount();
+    }
+    
+    function updateNotificationCount() {
+        const unreadCount = notifications.filter(n => !n.read).length;
+        if (unreadCount > 0) {
+            notificationBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+            notificationBadge.style.display = 'flex';
+        } else {
+            notificationBadge.style.display = 'none';
+        }
+    }
+    
+    // Toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        // Remove toast after animation completes
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
     
     function getDefaultTasks() {
@@ -271,7 +511,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 category: 'bathroom',
                 coins: 30,
                 completed: false,
-                type: 'daily'
+                priority: 'medium',
+                type: 'daily',
+                createdAt: new Date().toISOString()
             },
             {
                 id: 2,
@@ -279,7 +521,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 category: 'physical',
                 coins: 40,
                 completed: false,
-                type: 'daily'
+                priority: 'medium',
+                type: 'daily',
+                createdAt: new Date().toISOString()
             },
             {
                 id: 3,
@@ -287,7 +531,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 category: 'hygiene',
                 coins: 50,
                 completed: false,
-                type: 'daily'
+                priority: 'medium',
+                type: 'daily',
+                createdAt: new Date().toISOString()
             }
         ];
     }
@@ -346,6 +592,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 80% { opacity: 1; }
                 100% { transform: translate(-50%, -100px); opacity: 0; }
             }
+            
+            .purchased-badge {
+                background-color: #6bab7e;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+            }
+            
+            .apply-btn.disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
         </style>
     `);
+    
+    // Allow user to change username
+    document.getElementById('username').addEventListener('click', function() {
+        const newUsername = prompt('Enter your name:', username);
+        if (newUsername && newUsername.trim() !== '') {
+            username = newUsername.trim();
+            localStorage.setItem('username', username);
+            updateUsername();
+        }
+    });
 });
