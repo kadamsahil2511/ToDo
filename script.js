@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const usernameElements = document.querySelectorAll('#username, .rewards-username');
     const notificationBadge = document.querySelector('.notification-badge');
     const audio = new Audio('audio.mp3'); 
+    const chatbotModal = document.getElementById('chatbot-modal');
+    const chatbotBtn = document.querySelector('.chatbot-btn');
     // App state
     let tasks = JSON.parse(localStorage.getItem('tasks')) || getDefaultTasks();
     let rewards = JSON.parse(localStorage.getItem('rewards')) || getDefaultRewards();
@@ -790,5 +792,10 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('username', username);
             updateUsername();
         }
+    });
+    
+    // Chatbot event listener
+    chatbotBtn.addEventListener('click', function() {
+        chatbotModal.classList.add('show');
     });
 });

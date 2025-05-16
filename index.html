@@ -55,6 +55,9 @@
                     <button class="circle-btn add-btn">
                         <i class="fas fa-plus"></i>
                     </button>
+                    <button class="circle-btn chatbot-btn">
+                        <i class="fas fa-robot"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -134,8 +137,33 @@
         
         <!-- Toast Notifications -->
         <div id="toast-container" class="toast-container"></div>
+        
+        <!-- AI Chatbot Modal -->
+        <div class="modal" id="chatbot-modal">
+            <div class="modal-content chatbot-content">
+                <span class="close-modal">&times;</span>
+                <h1>AI Assistant</h1>
+                <div class="chatbot-container">
+                    <div class="chatbot-messages" id="chatbot-messages">
+                        <!-- Messages will appear here -->
+                        <div class="message bot-message">
+                            <div class="message-content">
+                                <p>👋 Hi there! I'm your habit assistant. How can I help you today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chatbot-input">
+                        <input type="text" id="chatbot-input" placeholder="Ask me anything about habits...">
+                        <button id="send-message-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="script.js"></script>
+    <script src="chatbot.js"></script>
 </body>
 </html>
